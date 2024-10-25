@@ -9,6 +9,7 @@ import {
   serverTimestamp,
   query,
   orderBy,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "../services/Firebase";
 import {
@@ -85,12 +86,14 @@ function* onToggleAllTodosSaga({ payload }) {
       id: doc.id,
       ...doc.data(),
     }));
-    for (const todo of todos) {
+    const batch = writeBatch(db);
+    todos.forEach((todo) => {
       const todoDocRef = doc(db, "todos", todo.id);
-      yield updateDoc(todoDocRef, {
+      batch.update(todoDocRef, {
         completed: payload.completed,
       });
-    }
+    });
+    yield batch.commit();
   } catch (error) {
     console.error("Error toggling all todos: ", error);
   }
@@ -103,10 +106,12 @@ function* onClearCompletedTodosSaga() {
     const completedTodos = todosSnapshot.docs
       .map((doc) => ({ id: doc.id, ...doc.data() }))
       .filter((todo) => todo.completed);
-    for (const todo of completedTodos) {
+    const batch = writeBatch(db);
+    completedTodos.forEach((todo) => {
       const todoDocRef = doc(db, "todos", todo.id);
-      yield deleteDoc(todoDocRef);
-    }
+      batch.delete(todoDocRef);
+    });
+    yield batch.commit();
   } catch (error) {
     console.error("Error clearing completed todos: ", error);
   }
