@@ -7,7 +7,7 @@ import "../../styles/body/TodoItem.css";
 import "react-toastify/dist/ReactToastify.css";
 
 const TodoItem = ({ todo }) => {
-  const [edit, setEdit] = useState(false);
+  const [isEdit, setEdit] = useState(false);
   const [text, setText] = useState(todo.text);
   const dispatch = useDispatch();
 
@@ -44,14 +44,14 @@ const TodoItem = ({ todo }) => {
   return (
     <li className={todo.completed ? "liComplete" : "li"}>
       <div className="row">
-        {!edit && (
+        {!isEdit && (
           <input
             type="checkbox"
             checked={todo.completed}
             onChange={handleCheckboxChange}
           />
         )}
-        {edit ? (
+        {isEdit ? (
           <input
             type="text"
             onChange={(e) => setText(e.target.value)}
@@ -74,7 +74,7 @@ const TodoItem = ({ todo }) => {
             </p>
           </div>
         )}
-        {!edit && (
+        {!isEdit && (
           <button className="deleteTodo" onClick={handleDelete}>
             x
           </button>
